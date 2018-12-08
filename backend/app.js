@@ -1,7 +1,7 @@
 const express = require('express');
 const socket = require('socket.io');
-// const {Vec2, World} = require("planck-js")
-
+const planck = require("planck-js")
+const {Vec2, World} = planck
 
 
 
@@ -20,11 +20,20 @@ app.use(express.static("../frontend"));
 var io = socket(server);
 //on connection event (with a new client) you can call callback function and store socket object
 class Player {
-    constructor(soc) {
+    constructor(world, soc) {
         this.id = soc.id
         this.location = [0, 0]
         this.rotation = 0
         this.dirty = false
+
+        var ground = world.getPhysics().createBody({
+          type: 'static',
+          position: Vec2(0, 0)
+        });
+
+        ground.createFixture({
+          shape: planck.Circle(Vec2(0.0, 0.0), 5)
+        });
     }
 }
 
@@ -43,9 +52,12 @@ class GameWorld {
         const num_blocks = 50;
         this.size = size * num_blocks;
 
-        // this.physicsWorld = World({
-        //     gravity: Vec2(0, 0)
-        // });
+        let physicsWorld = World({
+            gravity: Vec2(0, 0)
+        });
+
+        this.getPhysics = () => physicsWorld
+
     }
 
     update() {
@@ -57,7 +69,7 @@ let world = new GameWorld();
 
 io.on("connection", function(socket){
     console.log("made socket connection", socket.id);
-    let player = new Player(socket);
+    let player = new Player(world, socket);
     world.players[socket.id] = player
 
     // setTimeout(() => {

@@ -1,8 +1,9 @@
 const express = require('express');
 const socket = require('socket.io');
-const 
+const planck = require("planck-js")
+let {Vec2} = planck
 
-var world = planck.World({
+var physics_world = planck.World({
     gravity: Vec2(0, 0)
 });
 

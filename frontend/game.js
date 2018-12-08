@@ -1,35 +1,9 @@
-//Make connection
-var socket = io.connect('http://localhost:3000');
-
-//Query Document Object Model, storing elements in variables
-var message = document.getElementById('message'),
-    handle = document.getElementById("handle"),
-    btn = document.getElementById("send"),
-    output = document.getElementById("output"),
-    feedback = document.getElementById("feedback");
-
-
-
 //other clientside events
-document.addEventListener("keydown", function(event){
-    key = event.which //the key number
-    
-    if(key == 87) {
-        //if the key is equal to w, move up
-        move(0,1);
-    } else if(key == 83) {
-        //if the key is equal to s, move down
-        move(0,-1);
-    } else if(key == 65) {
-        //if the key is equal to a move left
-        move(-1,0);
-    } else if(key == 68) {
-        //if the key is equal to d move right
-        move(1,0);
-    }
-})
 
 
+let players = {
+
+}
 
 /*
 
@@ -41,55 +15,14 @@ message.addEventListener("keypress", function(){
 })*/
 
 //listen for server events
-socket.on("chat", function(data) {
-    output.innerHTML += "<p><strong>" +data.handle + ":</strong>"
-    + data.message + "</p>";
-    feedback.innerHTML = "";
-});
-
-socket.on("player:new", function(player) {
-    if(player.id != socket.id) {
-
-    }
-})
-
-socket.on("player:update", function(player) {
-    app.stage.children[0].position.x = player.location[0]
-    app.stage.children[0].position.y = player.location[1]
-} )
+// socket.on("chat", function(data) {
+//     output.innerHTML += "<p><strong>" +data.handle + ":</strong>"
+//     + data.message + "</p>";
+//     feedback.innerHTML = "";
+// });
 
 //emit events
 //move rotate and fire
-function move(xDirection, yDirection) {
-    socket.emit("move",{
-        direction : [xDirection,yDirection]
-    });
-}
-
-function rotate(angle) {
-    socket.emit("rotate", {
-        bearing : angle
-    })
-}
-
-function fire() {
-    socket.emit("fire", {
-        
-    })
-}
-
-function connected() {
-    socket.emit("connect", {
-
-    });
-}
-
-
-
-
-
-
-
 
 
 //Create a Pixi Application
@@ -116,15 +49,80 @@ PIXI.loader
 
 //This `setup` function will run when the image has loaded
 function setup() {
+	let socket = io.connect("http://127.0.0.1:3000")
+ 
+	document.addEventListener("keydown", function(event){
+    key = event.which //the key number
+    if(key == 87) {
+        //if the key is equal to w, move up
+        move(0,1);
+    } else if(key == 83) {
+        //if the key is equal to s, move down
+        move(0,-1);
+    } else if(key == 65) {
+        //if the key is equal to a move left
+        move(-1,0);
+    } else if(key == 68) {
+        //if the key is equal to d move right
+        move(1,0);
+    }
+	})
 
+	socket.on("player:new", function(player) {
+		console.log("player:new")
+		let playerSprite = new PIXI.Sprite(PIXI.loader.resources["assets/textures/player.png"].texture);
+		playerSprite.name = player.id
+		app.stage.addChild(playerSprite);
+		players[player.id] = { player, sprite: playerSprite }
+		
+	})
+
+	socket.on("player:update", function(player) {
+		// console.log("player:update")
+		players[player.id].player = player
+		players[player.id].sprite.position.x = player.location[0]
+		players[player.id].sprite.position.y = player.location[1]
+
+	})
+
+	socket.on("world:full", function() {
+		
+	})
+
+	function move(xDirection, yDirection) {
+		socket.emit("move",{
+				direction : [xDirection, yDirection]
+		});
+	}
+
+	function rotate(angle) {
+		socket.emit("rotate", {
+				bearing : angle
+		})
+	}
+
+	function fire() {
+		socket.emit("fire", {
+				
+		})
+	}
+
+	function connected() {
+			socket.emit("connect", {
+
+			});
+	}
   //Create the player sprite
-  let player = new PIXI.Sprite(PIXI.loader.resources["assets/textures/player.png"].texture);
   
-  //Add the cat to the stage
-  app.stage.addChild(player);
 
   connected();
 }
+
+app.renderer.view.addEventListener("mousemove", function(event) {
+   console.log(event.clientX)
+   console.log(event.clientY)
+})
+
 
 app.renderer.view.addEventListener("click", function(event) {
     socket.emit("click", {

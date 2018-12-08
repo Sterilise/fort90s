@@ -38,7 +38,7 @@ class Block {
 
 class GameWorld {
     constructor(size) {
-        this.players = []
+        this.players = {}
         this.block = []
         const num_blocks = 50;
         this.size = size * num_blocks;
@@ -58,13 +58,17 @@ let world = new GameWorld();
 io.on("connection", function(socket){
     console.log("made socket connection", socket.id);
     let player = new Player(socket);
-    world.players.push(player)
+    world.players[socket.id] = player
 
-    io.emit("player:new", player)
-    
+    // setTimeout(() => {
+    socket.emit("world:full", world) // we send ourselves the 
+    socket.broadcast.emit("player:new", player) // we don't need to send ourselvs.
+    // });
+
     socket.on("move", data => {
-        player.location[0] + data.direction[0]
-        player.location[1] + data.direction[1]
+        player.location[0] += data.direction[0]*5
+        player.location[1] += data.direction[1]*-5
+        console.log(player, data)
         io.emit("player:update", player)
     });
 

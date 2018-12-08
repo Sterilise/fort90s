@@ -67,6 +67,8 @@ class GameWorld {
 
 let world = new GameWorld();
 
+
+
 io.on("connection", function(socket){
     console.log("made socket connection", socket.id);
     let player = new Player(world, socket);
@@ -100,6 +102,10 @@ io.on("connection", function(socket){
     socket.on("place", data => {
         
     })
+
+    socket.on('disconnect', (reason) => {
+        delete world.players[socket.id]
+    });
 
     // socket.on("chat", function(data){
     //     io.sockets.emit("chat", data)

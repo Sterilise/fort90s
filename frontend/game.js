@@ -78,17 +78,21 @@ function setup() {
 	})
 
 	socket.on("player:update", function(player) {
-		// console.log("player:update")
+		console.log("player:update", players[player.id])
 		players[player.id].player = player
-		players[player.id].sprite.position.x = player.location[0]
-		players[player.id].sprite.position.y = player.location[1]
+		players[player.id].sprite.x = player.location[0]
+		players[player.id].sprite.y = player.location[1]
 
 	})
 
 	socket.on("world:full", data => {
 		for(let key in data.players){
             let playerSprite = new PIXI.Sprite(PIXI.loader.resources["assets/textures/player.png"].texture);
-            players[key] = { data:players[key], playerSprite}
+						let player = data.players[key]
+						players[key] = { player, sprite: playerSprite}
+						playerSprite.x = player.location[0]
+						playerSprite.y = player.location[1]
+						app.stage.addChild(playerSprite)
         }
 	})
 

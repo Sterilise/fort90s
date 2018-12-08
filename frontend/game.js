@@ -85,32 +85,43 @@ function setup() {
         }
         })
 
-	socket.on("player:new", function(player) {
-		console.log("player:new")
+	function updatePlayerSprite(sprite, player) {
+		sprite.x = player.location[0]
+		sprite.y = player.location[1]
+		sprite.rotation = player.rotation;
+	}
+
+	function createPlayerSprite(player) {
 		let playerSprite = new PIXI.Sprite(PIXI.loader.resources["assets/textures/player.png"].texture);
 		playerSprite.name = player.id
-		app.stage.addChild(playerSprite);
-		players[player.id] = { player, sprite: playerSprite }
+		return playerSprite
+	}
+
+	socket.on("player:new", function(player) {
+		console.log("player:new")
+		let sprite = createPlayerSprite(player)
+		app.stage.addChild(sprite);
+		players[player.id] = { player, sprite }
 		
 	})
 
 	socket.on("player:update", function(player) {
 		console.log("player:update", players[player.id])
 		players[player.id].player = player
-		players[player.id].sprite.x = player.location[0]
-		players[player.id].sprite.y = player.location[1]
+		updatePlayerSprite(players[socket.id].sprite, player)
+
 
 	})
 
 	socket.on("world:full", data => {
 		for(let key in data.players){
-            let playerSprite = new PIXI.Sprite(PIXI.loader.resources["assets/textures/player.png"].texture);
-						let player = data.players[key]
-						players[key] = { player, sprite: playerSprite}
-						playerSprite.x = player.location[0]
-						playerSprite.y = player.location[1]
-						app.stage.addChild(playerSprite)
-        }
+			let player = data.players[key]
+			let sprite = createPlayerSprite(player)
+			players[key] = { player, sprite }
+			updatePlayerSprite(sprite, player)
+
+			app.stage.addChild(sprite)
+		}
 	})
 
 	
@@ -125,7 +136,7 @@ function setup() {
 
     function rotate(angle) {
         socket.emit("rotate", {
-                bearing : angle
+          rotation: angle
         })
     }
 
@@ -138,8 +149,18 @@ function setup() {
 
     //pixi canvas events
     app.renderer.view.addEventListener("mousemove", function(event) {
-    console.log(event.clientX)
-    console.log(event.clientY)
+			// console.log(event.clientX)
+			// console.log(event.clientY)
+			
+			 
+
+			let angleRad = Math.atan2(players[socket.id].player.location[0] - event.clientX,
+				players[socket.id].player.location[1] - event.clientY);
+
+
+			players[socket.id].sprite.rotation = -angleRad - Math.PI/2;
+			rotate(-angleRad - Math.PI/2)
+		 	// console.log((360 / Math.PI) * angleRad)
     })
 
 

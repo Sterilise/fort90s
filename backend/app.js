@@ -22,7 +22,7 @@ var io = socket(server);
 class Player {
     constructor(world, soc) {
         this.id = soc.id
-        this.location = [0, 0]
+        this.location = [100, 100]
         this.rotation = 0
         this.dirty = false
 

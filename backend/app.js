@@ -82,7 +82,7 @@ io.on("connection", function(socket){
     socket.on("move", data => {
         player.location[0] += data.direction[0]*5
         player.location[1] += data.direction[1]*-5
-        console.log(player, data)
+        // console.log(player, data)
         io.emit("player:update", player)
     });
 
@@ -104,6 +104,7 @@ io.on("connection", function(socket){
     })
 
     socket.on('disconnect', (reason) => {
+        socket.broadcast.emit("player:disconnect", socket.id) // we don't need to send ourselvs.
         delete world.players[socket.id]
     });
 

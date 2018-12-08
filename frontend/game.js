@@ -47,11 +47,16 @@ socket.on("chat", function(data) {
     feedback.innerHTML = "";
 });
 
-socket.on("typing", function(handler) {
-    console.log(handler);
-    feedback.innerHTML = "<p><em>" + handler + "is typing a message... </em></p>"; 
-});
+socket.on("player:new", function(player) {
+    if(player.id != socket.id) {
 
+    }
+})
+
+socket.on("player:update", function(player) {
+    app.stage.children[0].position.x = player.location[0]
+    app.stage.children[0].position.y = player.location[1]
+} )
 
 //emit events
 //move rotate and fire
@@ -71,6 +76,12 @@ function fire() {
     socket.emit("fire", {
         
     })
+}
+
+function connected() {
+    socket.emit("connect", {
+
+    });
 }
 
 
@@ -111,10 +122,14 @@ function setup() {
   
   //Add the cat to the stage
   app.stage.addChild(player);
+
+  connected();
 }
 
 app.renderer.view.addEventListener("click", function(event) {
-    socket.emit("click", {});
+    socket.emit("click", {
+
+    });
 })
 
 

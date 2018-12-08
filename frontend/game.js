@@ -55,24 +55,39 @@ function setup() {
     key = event.which //the key number
     if(key == 87) {
         //if the key is equal to w, move up
-        move(0,1);
+        speedUpdate(0,1)
     } else if(key == 83) {
         //if the key is equal to s, move down
-        move(0,-1);
+        speedUpdate(0,-1)
     } else if(key == 65) {
         //if the key is equal to a move left
-        move(-1,0);
+        speedUpdate(-1,0)
     } else if(key == 68) {
         //if the key is equal to d move right
-        move(1,0);
+        speedUpdate(1,0)
     }
-	})
+    })
+    
+    document.addEventListener("keyup", function(event){
+        key = event.which //the key number
+        if(key == 87) {
+            //if the key is equal to w, stop moving up
+            speedUpdate(0,-1)
+        } else if(key == 83) {
+            //if the key is equal to s,stop moving down
+            speedUpdate(0,1)
+        } else if(key == 65) {
+            //if the key is equal, stop moving left
+            speedUpdate(1,0)
+        } else if(key == 68) {
+            //if the key is equal, stop moving right
+            speedUpdate(-1,0)
+        }
+        })
 
 	socket.on("player:new", function(player) {
 		console.log("player:new")
 		let playerSprite = new PIXI.Sprite(PIXI.loader.resources["assets/textures/player.png"].texture);
-		playerSprite.anchor.x = 0.5
-		playerSprite.anchor.y = 0.5	
 		playerSprite.name = player.id
 		app.stage.addChild(playerSprite);
 		players[player.id] = { player, sprite: playerSprite }
@@ -87,18 +102,9 @@ function setup() {
 
 	})
 
-	socket.on("player:disconnect", id => {
-
-		app.stage.removeChild(players[id].sprite)
-		delete players[id]
-	})
-
 	socket.on("world:full", data => {
 		for(let key in data.players){
             let playerSprite = new PIXI.Sprite(PIXI.loader.resources["assets/textures/player.png"].texture);
-						playerSprite.anchor.x = 0.5
-						playerSprite.anchor.y = 0.5
-
 						let player = data.players[key]
 						players[key] = { player, sprite: playerSprite}
 						playerSprite.x = player.location[0]
@@ -111,15 +117,15 @@ function setup() {
 
   //Create the player sprite
   
-    function move(xDirection, yDirection) {
-        socket.emit("move",{
-        	direction : [xDirection, yDirection]
+    function speedUpdate(speedXIncrement, speedYIncrement) {
+        socket.emit("speed:update",{
+                speeds : [speedXIncrement, speedYIncrement]
         });
     }
 
     function rotate(angle) {
         socket.emit("rotate", {
-          bearing : angle
+                bearing : angle
         })
     }
 
@@ -132,18 +138,8 @@ function setup() {
 
     //pixi canvas events
     app.renderer.view.addEventListener("mousemove", function(event) {
-			// console.log(event.clientX)
-			// console.log(event.clientY)
-			
-			 
-
-			let angleRad = Math.atan2(players[socket.id].player.location[0] - event.clientX,
-				players[socket.id].player.location[1] - event.clientY);
-
-
-			players[socket.id].sprite.rotation = -angleRad - Math.PI/2;
-			
-		 	console.log((360 / Math.PI) * angleRad)
+    console.log(event.clientX)
+    console.log(event.clientY)
     })
 
 

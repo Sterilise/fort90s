@@ -17,16 +17,27 @@ app.use(express.static("public"));
 var io = socket(server);
 //on connection event (with a new client) you can call callback function and store socket object
 class Player {
-    constructor(id) {
-        this.id = id;
-        this.location = { x: 0, y: 0 }
+    constructor(socket) {
+        this.socket = socket
+        this.location = [0, 0]
+        this.rotation = 0
+    }
+}
+
+class Block {
+    constructor() {
+        this.location = [0, 0]// blocks have fixed size
+
     }
 }
 
 class World {
-    constructor() {
-        this.players = []
+    constructor(size) {
+        this.players = {}
         this.block = []
+        const num_blocks = 50;
+        this.size = size * num_blocks;
+
     }
 
     update() {
@@ -34,22 +45,28 @@ class World {
     }
 }
 
-let players = {}
+let world = new World();
 
 io.on("connection", function(socket){
     console.log("made socket connection", socket.id);
-    players[socket.id] = new Player(socket.id);
+    let player = new Player(socket);
+    world.players.push(player)
 
+
+    io.emit("player:new", player)
     socket.on("move", data => {
-        
+        player.location[0] + data.direction[0]
+        player.location[1] + data.direction[1]
+        io.emit("player", player)
     });
 
     socket.on("rotate", data => {
-
+        player.rotation = data.rotation
+        io.emit("player", player)
     });
 
     socket.on("fire", data => {
-
+        
     });
 
     socket.on("break", data => {
@@ -57,7 +74,7 @@ io.on("connection", function(socket){
     });
 
     socket.on("place", data => {
-
+        
     })
 
     socket.on("chat", function(data){

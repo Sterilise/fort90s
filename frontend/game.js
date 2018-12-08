@@ -85,8 +85,12 @@ function setup() {
 
 	})
 
-	socket.on("world:full", function() {
-		
+	socket.on("world:full", data => {
+		for(let key in data.players){
+            let playerSprite = new PIXI.Sprite(PIXI.loader.resources["assets/textures/player.png"].texture);
+            players[key] = { data:players[key], playerSprite}
+
+        }
 	})
 
 	function move(xDirection, yDirection) {

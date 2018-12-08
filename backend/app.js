@@ -1,6 +1,6 @@
 const express = require('express');
 const socket = require('socket.io');
-const {Vec2, World} = require("planck-js")
+// const {Vec2, World} = require("planck-js")
 
 
 
@@ -13,7 +13,7 @@ var server = app.listen(3000, function() {
 });
 
 //static files
-app.use(express.static("public"));
+app.use(express.static("../frontend"));
 
 
 //socket setup, socket io waits for clients to make a connection and sets one up between the two
@@ -21,7 +21,7 @@ var io = socket(server);
 //on connection event (with a new client) you can call callback function and store socket object
 class Player {
     constructor(soc) {
-        this.socket = soc
+        // this.socket = soc
         this.location = [0, 0]
         this.rotation = 0
         this.dirty = false
@@ -43,9 +43,9 @@ class GameWorld {
         const num_blocks = 50;
         this.size = size * num_blocks;
 
-        this.physicsWorld = World({
-            gravity: Vec2(0, 0)
-        });
+        // this.physicsWorld = World({
+        //     gravity: Vec2(0, 0)
+        // });
         
 
     }
@@ -61,7 +61,6 @@ io.on("connection", function(socket){
     console.log("made socket connection", socket.id);
     let player = new Player(socket);
     world.players.push(player)
-
 
     io.emit("player:new", player)
     socket.on("move", data => {
@@ -87,11 +86,11 @@ io.on("connection", function(socket){
         
     })
 
-    socket.on("chat", function(data){
-        io.sockets.emit("chat", data)
-    })
+    // socket.on("chat", function(data){
+    //     io.sockets.emit("chat", data)
+    // })
 
-    socket.on("typing", function(handler) {
-        socket.broadcast.emit("typing", handler);
-    })
+    // socket.on("typing", function(handler) {
+    //     socket.broadcast.emit("typing", handler);
+    // })
 });

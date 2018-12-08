@@ -30,6 +30,7 @@ document.addEventListener("keydown", function(event){
 })
 
 
+
 /*
 
 Do not need this event
@@ -90,6 +91,10 @@ let app = new PIXI.Application({
   }
 );
 
+//makes the canvas fill the whole screen.
+app.renderer.view.style.position = "absolute";
+app.renderer.view.style.display = "block";
+
 //Add the canvas that Pixi automatically created for you to the HTML document
 document.body.appendChild(app.view);
 
@@ -101,12 +106,16 @@ PIXI.loader
 //This `setup` function will run when the image has loaded
 function setup() {
 
-  //Create the cat sprite
-  let cat = new PIXI.Sprite(PIXI.loader.resources["assets/textures/player.png"].texture);
+  //Create the player sprite
+  let player = new PIXI.Sprite(PIXI.loader.resources["assets/textures/player.png"].texture);
   
   //Add the cat to the stage
-  app.stage.addChild(cat);
+  app.stage.addChild(player);
 }
+
+app.renderer.view.addEventListener("click", function(event) {
+    socket.emit("click", {});
+})
 
 
 

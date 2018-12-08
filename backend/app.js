@@ -1,5 +1,10 @@
-var express = require('express');
-var socket = require('socket.io');
+const express = require('express');
+const socket = require('socket.io');
+const 
+
+var world = planck.World({
+    gravity: Vec2(0, 0)
+});
 
 
 //App setup
@@ -17,23 +22,25 @@ app.use(express.static("public"));
 var io = socket(server);
 //on connection event (with a new client) you can call callback function and store socket object
 class Player {
-    constructor(socket) {
-        this.socket = socket
+    constructor(soc) {
+        this.socket = soc
         this.location = [0, 0]
         this.rotation = 0
+        this.dirty = false
     }
 }
+
 
 class Block {
     constructor() {
         this.location = [0, 0]// blocks have fixed size
-
+        this.dirty = false
     }
 }
 
 class World {
     constructor(size) {
-        this.players = {}
+        this.players = []
         this.block = []
         const num_blocks = 50;
         this.size = size * num_blocks;

@@ -1,11 +1,8 @@
 const express = require('express');
 const socket = require('socket.io');
-const planck = require("planck-js")
-let {Vec2} = planck
+const {Vec2, World} = require("planck-js")
 
-var physics_world = planck.World({
-    gravity: Vec2(0, 0)
-});
+
 
 
 //App setup
@@ -39,12 +36,17 @@ class Block {
     }
 }
 
-class World {
+class GameWorld {
     constructor(size) {
         this.players = []
         this.block = []
         const num_blocks = 50;
         this.size = size * num_blocks;
+
+        this.physicsWorld = World({
+            gravity: Vec2(0, 0)
+        });
+        
 
     }
 
@@ -53,7 +55,7 @@ class World {
     }
 }
 
-let world = new World();
+let world = new GameWorld();
 
 io.on("connection", function(socket){
     console.log("made socket connection", socket.id);

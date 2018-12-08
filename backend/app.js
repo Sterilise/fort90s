@@ -21,7 +21,7 @@ var io = socket(server);
 //on connection event (with a new client) you can call callback function and store socket object
 class Player {
     constructor(soc) {
-        // this.socket = soc
+        this.id = soc.id
         this.location = [0, 0]
         this.rotation = 0
         this.dirty = false
@@ -46,8 +46,6 @@ class GameWorld {
         // this.physicsWorld = World({
         //     gravity: Vec2(0, 0)
         // });
-        
-
     }
 
     update() {
@@ -63,15 +61,16 @@ io.on("connection", function(socket){
     world.players.push(player)
 
     io.emit("player:new", player)
+    
     socket.on("move", data => {
         player.location[0] + data.direction[0]
         player.location[1] + data.direction[1]
-        io.emit("player", player)
+        io.emit("player:update", player)
     });
 
     socket.on("rotate", data => {
         player.rotation = data.rotation
-        io.emit("player", player)
+        io.emit("player:update", player)
     });
 
     socket.on("fire", data => {

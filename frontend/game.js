@@ -89,50 +89,49 @@ function setup() {
 		for(let key in data.players){
             let playerSprite = new PIXI.Sprite(PIXI.loader.resources["assets/textures/player.png"].texture);
             players[key] = { data:players[key], playerSprite}
-
         }
 	})
 
-	function move(xDirection, yDirection) {
-		socket.emit("move",{
-				direction : [xDirection, yDirection]
-		});
-	}
+	
 
-	function rotate(angle) {
-		socket.emit("rotate", {
-				bearing : angle
-		})
-	}
-
-	function fire() {
-		socket.emit("fire", {
-				
-		})
-	}
-
-	function connected() {
-			socket.emit("connect", {
-
-			});
-	}
   //Create the player sprite
   
+    function move(xDirection, yDirection) {
+        socket.emit("move",{
+                direction : [xDirection, yDirection]
+        });
+    }
 
-  connected();
+    function rotate(angle) {
+        socket.emit("rotate", {
+                bearing : angle
+        })
+    }
+
+    function fire() {
+        socket.emit("fire", {
+                
+        })
+    }
+
+
+    //pixi canvas events
+    app.renderer.view.addEventListener("mousemove", function(event) {
+    console.log(event.clientX)
+    console.log(event.clientY)
+    })
+
+
+    app.renderer.view.addEventListener("click", function(event) {
+        socket.emit("click", {
+
+        });
+    })
 }
 
-app.renderer.view.addEventListener("mousemove", function(event) {
-   console.log(event.clientX)
-   console.log(event.clientY)
-})
 
 
-app.renderer.view.addEventListener("click", function(event) {
-    socket.emit("click", {
 
-    });
-})
 
 
 

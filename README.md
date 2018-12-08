@@ -8,3 +8,8 @@ frontend will be done in normal javascript with socket.io library.
 
 The clients will listen to the tick events and use the lobby object transmitted to 
 render the screen.
+
+
+Todo:
+-Integrate physics engine
+-and add all players when a player joins.

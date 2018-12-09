@@ -68,7 +68,7 @@ class BattleRoom extends Room {
       }
     }
     let remove = [];
-    let remove_player = [];
+    let damage_player = [];
 
     for(let key in this.state.bullets) {
       let bullet = this.state.bullets[key]
@@ -89,7 +89,7 @@ class BattleRoom extends Room {
         let player = this.state.players[key]
         let distance = Math.sqrt(Math.pow(player.location.x - bullet.locationX, 2) + Math.pow(player.location.y - bullet.locationY, 2))
         if(distance < 40){
-          remove_player.push(key)
+          damage_player.push(key)
         }
       }
 
@@ -99,8 +99,14 @@ class BattleRoom extends Room {
       delete this.state.bullets[item]
     })
 
-    remove_player.forEach(item => {
-      delete this.state.players[item]
+    damage_player.forEach(item => {
+      //delete this.state.players[item]
+      let new_health = this.state.players[item].hp - 30; //30 is the bullet damage
+      if(new_health <=0) {
+        delete this.state.players[item]; //removes players if there is negative health
+      } else {
+        this.state.players[item].hp = new_health; //reduces players health otherwise
+      }
     })
 
 

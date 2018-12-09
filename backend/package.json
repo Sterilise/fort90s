@@ -7,11 +7,12 @@
     "@colyseus/monitor": "^0.1.10",
     "colyseus": "^0.9.21",
     "express": "^4.16.4",
+    "pixi-viewport": "^3.12.1",
     "planck-js": "^0.3.0-rc.2",
     "socket.io": "^2.2.0",
-    "uws": "^99.0.0",
     "ts-node": "^5.0.1",
-    "typescript": "^2.7.2"
+    "typescript": "^2.7.2",
+    "uws": "^99.0.0"
   },
   "devDependencies": {
     "ts-node": "^5.0.1"

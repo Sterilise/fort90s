@@ -10,7 +10,7 @@ class Player {
       this.dirty = false
       this.hp = 100
       this.armor = 100
-
+      this.wood = 1
       // var ground = world.getPhysics().createBody({
       //   type: 'static',
       //   position: Vec2(0, 0)
@@ -28,12 +28,13 @@ class Bullet {
   constructor(id, x, y, rotation) {
     this.locationX = x
     this.locationY = y
-    this.speedX = Math.cos(rotation - Math.PI/2)
-    this.speedY = Math.sin(rotation - Math.PI/2)
+    this.speedX = () => Math.cos(rotation - Math.PI/2)
+    this.speedY = () => Math.sin(rotation - Math.PI/2)
+    
     console.log(this.speedX, this.locationY)
     this.playerId = id
     this.rotation = rotation
-    this.life = 40 // in ticks
+    this.life = 100 // in ticks
   }
 }
 
@@ -71,9 +72,11 @@ class BattleRoom extends Room {
 
     for(let key in this.state.bullets) {
       let bullet = this.state.bullets[key]
+      // bullet.speedX += 4
+      // bullet.speedY += 4
 
-      bullet.locationX += bullet.speedX*15
-      bullet.locationY += bullet.speedY*15 
+      bullet.locationX += bullet.speedX()*5*((100 - bullet.life)/70)
+      bullet.locationY += bullet.speedY()*5*((100 - bullet.life)/70)
 
       bullet.life -= 1
       if(bullet.life == 0){
@@ -106,7 +109,9 @@ class BattleRoom extends Room {
 
   onMessage (client, {data, action}) {
     let player = this.state.players[ client.sessionId ]
-
+    if(!player){
+      return
+    }
     console.log(action, data)
     switch(action) {
       case "player:speed": 

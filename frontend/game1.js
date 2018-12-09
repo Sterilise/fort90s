@@ -6,6 +6,8 @@ var client = new Colyseus.Client(location.protocol.replace("http", "ws") + host 
 // let client = new Colyseus.Client("ws://localhost:3000");
 let room = client.join("battle");
 
+
+
 let app = new PIXI.Application({ 
     width: window.innerWidth, 
     height: window.innerHeight,                       
@@ -20,6 +22,57 @@ app.renderer.view.style.position = "absolute";
 app.renderer.view.style.display = "block";
 
 document.body.appendChild(app.view);
+
+var viewport = new PIXI.extras.Viewport({
+    screenWidth: window.innerWidth,
+    screenHeight: window.innerHeight,
+    worldWidth: 5000,
+    worldHeight: 5000,
+
+    interaction: app.renderer.interaction // the interaction module is important for wheel() to work properly when renderer.view is placed or scaled
+});
+
+
+
+app.stage.addChild(viewport);
+
+viewport
+    // .drag()
+    // .pinch()
+    .wheel()
+    // .bounce()
+    .clamp({ left: true, right: true, top: true, bottom: true, direction: "all"})
+    // .decelerate();
+
+var graphics = new PIXI.Graphics();
+
+graphics.beginFill(0xFFFFFF);
+graphics.lineStyle(4, 0x000000, 1);
+
+// draw a shape
+graphics.moveTo(0,0);
+graphics.lineTo(5000, 0);
+graphics.lineTo(5000, 5000);
+graphics.lineTo(0, 5000);
+graphics.lineTo(0, 0);
+
+graphics.endFill();
+
+graphics.beginFill(0x77cc77);
+graphics.lineStyle(4, 0x000000, 1);
+
+// draw a shape
+graphics.moveTo(500, 500);
+graphics.lineTo(4500, 500);
+graphics.lineTo(4500, 4500);
+graphics.lineTo(500, 4500);
+graphics.lineTo(500, 500);
+
+graphics.endFill();
+
+viewport.addChild(graphics)
+
+
 
 let sprites = {}
 let bullets = {}
@@ -36,7 +89,7 @@ function setup() {
     // console.log(PIXI.loader.resources["assets/textures/Moving.json"].spritesheet)
     
 
-    // app.stage.addChild(animated)
+    // viewport.addChild(animated)
     
     let keys = {x: 0, y: 0}
     function speedUpdate(x, y) {
@@ -96,6 +149,11 @@ function setup() {
         if(player.speed.x == 0 && player.speed.y == 0){
             sprite.gotoAndStop(0)
         }
+
+        if(sprite.name === room.sessionId) {
+            viewport.moveCenter(player.location.x, player.location.y)
+        }
+
 	}
 
 
@@ -113,8 +171,8 @@ function setup() {
         // playerSprite.play()
 		sprite.anchor.x = 0.5
         sprite.anchor.y = 0.5
-        sprite.scale.x = 0.5
-        sprite.scale.y = 0.5
+        sprite.scale.x = 0.7
+        sprite.scale.y = 0.7
 		return sprite
     }
 
@@ -136,7 +194,7 @@ function setup() {
         let sprite = createPlayerSprite(key)
         sprites[key] = sprite
         updatePlayerSprite(sprite, player)
-        app.stage.addChild(sprite)
+        viewport.addChild(sprite)
     }
 
 
@@ -147,7 +205,7 @@ function setup() {
         console.log("id: ", change)
 
         if(change.operation === "remove") {
-            app.stage.removeChild(sprites[key])
+            viewport.removeChild(sprites[key])
             delete sprites[key]
             return
         }
@@ -156,7 +214,7 @@ function setup() {
             let sprite = createPlayerSprite(key)
 
             sprites[key] = sprite
-            app.stage.addChild(sprite)
+            viewport.addChild(sprite)
 
             updatePlayerSprite(sprite, player)
         }else{
@@ -182,7 +240,7 @@ function setup() {
     room.listen("bullets/:id", change => {
         console.log(change)
         if(change.operation === "remove") {
-            app.stage.removeChild(bullets[change.path.id])
+            viewport.removeChild(bullets[change.path.id])
             delete bullets[change.path.id]
         }else{
             let sprite = createBulletSprite()
@@ -191,7 +249,7 @@ function setup() {
             sprite.x = change.value.locationX 
             sprite.y = change.value.locationY
             sprite.rotation = change.value.rotation
-            app.stage.addChild(sprite) 
+            viewport.addChild(sprite) 
             bullets[change.path.id] = (sprite)
         }
     })
@@ -210,8 +268,9 @@ function setup() {
     app.renderer.view.addEventListener("mousemove", function(event) {
         let player = room.state.players[room.sessionId]
         let sprite = sprites[room.sessionId] 
+        let mouse = viewport.toWorld(event.clientX, event.clientY)
 
-        let angleRad = Math.atan2(player.location.x - event.clientX, player.location.y - event.clientY);
+        let angleRad = Math.atan2(player.location.x -  mouse.x, player.location.y - mouse.y);
 
         sprite.rotation = -angleRad;
         rotate(-angleRad)

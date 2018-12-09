@@ -10,6 +10,13 @@ The clients will listen to the tick events and use the lobby object transmitted 
 render the screen.
 
 
+## What is new
+ - The backend uses colyseus for state synchonization, with msgpack. We don't use a physics engine as this will be an overkill for simple point to circle collision detecton. And we don't have any acceleration anyway. 
+ Use `node app1.js` to run the server.
+ You will be able to access the game on http://localhost:3000.
+
 Todo:
--Integrate physics engine
--and add all players when a player joins.
+ - Place blocks
+ - Have a better background map
+ - Inventory for materials
+ - Destroy environement

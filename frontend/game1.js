@@ -47,8 +47,7 @@ function setup() {
     function detectKey(key, call) {
         return function(pressed_key) {
             if(key == pressed_key && pressed[key] !== true) {
-                call()
-                
+                call() 
                 speedUpdate()
                 pressed[key] = true
             }
@@ -58,8 +57,7 @@ function setup() {
     function releaseKey(key, call) {
         return function(pressed_key) {
             if(key == pressed_key && pressed[key] !== false){
-                call()
-                
+                call() 
                 speedUpdate()
                 pressed[key] = false
             }

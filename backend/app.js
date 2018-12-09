@@ -23,8 +23,11 @@ class Player {
     constructor(world, soc) {
         this.id = soc.id
         this.location = [100, 100]
+        this.speed = [0, 0]
         this.rotation = 0
         this.dirty = false
+        this.hp = 100
+        this.armor = 100
 
         var ground = world.getPhysics().createBody({
           type: 'static',
@@ -34,6 +37,8 @@ class Player {
         ground.createFixture({
           shape: planck.Circle(Vec2(0.0, 0.0), 5)
         });
+
+        this.getSocket = () => soc
     }
 }
 
@@ -67,21 +72,33 @@ class GameWorld {
 
 let world = new GameWorld();
 
+const damp = 5;
 
+setTimeout(() => {
+    for(var key in GameWorld.players){
+        var player = GameWorld.players[key]
+
+        player.location[0] += player.speed[0]*damp;
+        player.location[1] += player.speed[1]*damp;
+    }
+    io.emit("world:full", world)
+    
+}, 1000/30)
 
 io.on("connection", function(socket){
     console.log("made socket connection", socket.id);
     let player = new Player(world, socket);
     world.players[socket.id] = player
 
+    
     // setTimeout(() => {
     socket.emit("world:full", world) // we send ourselves the 
     socket.broadcast.emit("player:new", player) // we don't need to send ourselvs.
     // });
 
-    socket.on("move", data => {
-        player.location[0] += data.direction[0]*5
-        player.location[1] += data.direction[1]*-5
+    socket.on("player:speed", data => {
+        player.speed[0] += data.speed[0]
+        player.speed[1] += data.speed[1]
         // console.log(player, data)
         io.emit("player:update", player)
     });

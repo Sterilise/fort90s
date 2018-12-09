@@ -94,6 +94,9 @@ function setup() {
 	function createPlayerSprite(player) {
 		let playerSprite = new PIXI.Sprite(PIXI.loader.resources["assets/textures/player.png"].texture);
 		playerSprite.name = player.id
+		playerSprite.anchor.x = 0.5
+		playerSprite.anchor.y = 0.5
+
 		return playerSprite
 	}
 
@@ -114,6 +117,10 @@ function setup() {
 	})
 
 	socket.on("world:full", data => {
+		console.log("world:full")
+		players = {}
+		app.stage.children = []
+
 		for(let key in data.players){
 			let player = data.players[key]
 			let sprite = createPlayerSprite(player)
@@ -129,8 +136,8 @@ function setup() {
   //Create the player sprite
   
     function speedUpdate(speedXIncrement, speedYIncrement) {
-        socket.emit("speed:update",{
-                speeds : [speedXIncrement, speedYIncrement]
+        socket.emit("player:speed",{
+                speed: [speedXIncrement, speedYIncrement]
         });
     }
 
@@ -154,12 +161,12 @@ function setup() {
 			
 			 
 
-			let angleRad = Math.atan2(players[socket.id].player.location[0] - event.clientX,
-				players[socket.id].player.location[1] - event.clientY);
+        let angleRad = Math.atan2(players[socket.id].player.location[0] - event.clientX,
+            players[socket.id].player.location[1] - event.clientY);
 
 
-			players[socket.id].sprite.rotation = -angleRad - Math.PI/2;
-			rotate(-angleRad - Math.PI/2)
+        players[socket.id].sprite.rotation = -angleRad - Math.PI/2;
+        rotate(-angleRad - Math.PI/2)
 		 	// console.log((360 / Math.PI) * angleRad)
     })
 

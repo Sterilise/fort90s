@@ -34,7 +34,7 @@ class Bullet {
     console.log(this.speedX, this.locationY)
     this.playerId = id
     this.rotation = rotation
-    this.life = 100 // in ticks
+    this.life = 50 // in ticks
   }
 }
 
@@ -75,8 +75,8 @@ class BattleRoom extends Room {
       // bullet.speedX += 4
       // bullet.speedY += 4
 
-      bullet.locationX += bullet.speedX()*5*((100 - bullet.life)/70)
-      bullet.locationY += bullet.speedY()*5*((100 - bullet.life)/70)
+      bullet.locationX += bullet.speedX()*(30 + ((100 - bullet.life)/20))
+      bullet.locationY += bullet.speedY()*(30 + ((100 - bullet.life)/20))
 
       bullet.life -= 1
       if(bullet.life == 0){
